@@ -61,7 +61,7 @@ class Transaction:
         pubkey = privkey_to_pubkey(self._privkey)
         base64_pubkey = base64.b64encode(pubkey).decode("utf-8")
         pushable_tx = {
-            "tx": {
+            "tx": json.dumps({
                 "msg": self._msgs,
                 "fee": {
                     "gas": str(self._gas),
@@ -76,10 +76,12 @@ class Transaction:
                         "sequence": str(self._sequence),
                     }
                 ],
-            },
-            "mode": self._sync_mode,
+            }, separators=(",", ":"))
+            #"mode": self._sync_mode,
         }
-        return json.dumps(pushable_tx, separators=(",", ":"))
+
+        #return json.dumps(pushable_tx, separators=(",", ":"))
+        return pushable_tx
 
     def _sign(self) -> str:
         message_str = json.dumps(self._get_sign_message(), separators=(",", ":"), sort_keys=True)
@@ -105,3 +107,31 @@ class Transaction:
             "sequence": str(self._sequence),
             "msgs": self._msgs,
         }
+
+'''
+pushable_tx = {
+          "tx": {
+            "msg": [self._msgs],
+            "fee": {
+              "gas": str(self._gas),
+              "amount": [
+                {
+                  "denom": self._fee_denom,
+                  "amount": str(self._fee)
+                }
+              ]
+            },
+            "memo": self._memo,
+            "signature": {
+              "signature": self._sign(),
+              "pub_key": {
+                    "type": "tendermint/PubKeySecp256k1", 
+                    "value": base64_pubkey
+                },
+              "account_number": str(self._account_num),
+              "sequence": str(self._sequence)
+            }
+          },
+          "mode": self._sync_mode
+        }
+'''
